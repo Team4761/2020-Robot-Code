@@ -8,11 +8,13 @@
 package org.robockets.infiniterecharge;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.robockets.infiniterecharge.drivetrain.DrivetrainSubsystem;
+import org.robockets.infiniterecharge.drivetrain.JoyrideCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -27,7 +29,8 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  public static DrivetrainSubsystem Drivetrain = DrivetrainSubsystem.getInstance();
+  public static DrivetrainSubsystem Drivetrain;
+  public static OI m_oi;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -38,6 +41,11 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    Drivetrain = DrivetrainSubsystem.getInstance();
+    m_oi = OI.getInstance();
+
+    Command Joyride = new JoyrideCommand();
   }
 
   /**

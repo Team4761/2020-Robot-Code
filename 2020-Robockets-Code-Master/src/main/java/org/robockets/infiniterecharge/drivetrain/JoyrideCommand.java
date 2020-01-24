@@ -24,13 +24,13 @@ public class JoyrideCommand extends Command {
     @Override
     protected void execute() {
         double translate = OI.xbox.getRawAxis(1)*DrivetrainSubsystem.TRANSLATE_SPEED;
-        double rotate = -OI.xbox.getRawAxis(4)*DrivetrainSubsystem.ROTATE_SPEED;
+        double rotate = -OI.xbox.getRawAxis(2)*DrivetrainSubsystem.ROTATE_SPEED;
 
-        translate = ((translate-previousTranslate)*RAMP_FACTOR)+previousTranslate;
+        /*translate = ((translate-previousTranslate)*RAMP_FACTOR)+previousTranslate; //PID systems may mess this over, so here. I just kept it simple
         rotate = ((rotate-previousRotate)*RAMP_FACTOR)+previousRotate;
 
         previousTranslate = translate;
-        previousRotate = rotate;
+        previousRotate = rotate;*/
 
         Robot.Drivetrain.driveArcade(translate, rotate);
     }

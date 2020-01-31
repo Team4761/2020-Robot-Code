@@ -30,19 +30,24 @@ public class RobotMap {
 
     //wheel //TODO: find actual ports!!!
     public static ColorSensorV3 ColorSensor = new ColorSensorV3(I2C.Port.kOnboard);
-    public static Spark WheelSpinner = new Spark(4);
-    public static Encoder WheelSpinnerEncoder = new Encoder(4,1); //TODO: find correct ports
-    public static Solenoid PistonArm = new Solenoid(5);
+    public static Spark WheelSpinner = new Spark(0);
+    public static Encoder WheelSpinnerEncoder = new Encoder(0,0); //TODO: find correct ports
+    public static Solenoid PistonArm = new Solenoid(1);
 
     //shooter
+    public static Spark PolyCordController = new Spark(2);
+    public static Spark FlyWheel1 = new Spark(3);
+    public static Spark FlyWheel2 = new Spark(4);
+    public static Spark InputWheel = new Spark(5);
 
+    public static DigitalInput intakeBreakBeam = new DigitalInput(0); //DIO port
+    public static DigitalInput flywheelBreakBeam = new DigitalInput(2);
 
     //climber
-    public static Spark TelescopeLeft = new Spark(6);
-    public static Spark TelescopeRight = new Spark(7);
+    public static Spark Telescope = new Spark(6); //The PWM cable will be spilt between left and right
 
-    public static Spark ReelInLeft = new Spark(8);
-    public static Spark ReelInRight = new Spark(9);
+    public static Spark ReelInLeft = new Spark(7); //The PWM cable will be split between left and right
+    public static Spark ReelInRight = new Spark(8);
 
 
 }

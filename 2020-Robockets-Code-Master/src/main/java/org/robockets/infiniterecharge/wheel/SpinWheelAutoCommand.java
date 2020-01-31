@@ -6,17 +6,15 @@ import org.robockets.infiniterecharge.Robot;
 public class SpinWheelAutoCommand extends Command {
 
     private double degrees;
-    private boolean direction;
 
-    public SpinWheelAutoCommand(double degrees, boolean direction) {
+    public SpinWheelAutoCommand(double degrees) {
         requires(Robot.Wheel);
         this.degrees = degrees;
-        this.direction = direction;
     }
 
     @Override
     protected void initialize() {
-        Robot.Wheel.spin(degrees,direction);
+        Robot.Wheel.spinAuto(degrees);
     }
 
     @Override
@@ -32,7 +30,7 @@ public class SpinWheelAutoCommand extends Command {
 
     @Override
     protected void end() {
-        Robot.Wheel.spin(0.0,false);
+        Robot.Wheel.spinAuto(0.0);
     }
 
     @Override

@@ -1,14 +1,15 @@
-package org.robockets.infiniterecharge.wheel;
+package org.robockets.infiniterecharge.autonomous;
 
 import edu.wpi.first.wpilibj.command.Command;
-import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
-import org.robockets.infiniterecharge.wheel.WheelSubsystem;
 
-public class SpinWheelCommand extends Command {
+public class RotateAutoControlledCommand extends Command {
 
-    public SpinWheelCommand() {
-        requires(Robot.Wheel);
+    private double rotation;
+
+    public RotateAutoControlledCommand(double degrees) {
+        requires(Robot.Drivetrain);
+        this.rotation = degrees;
     }
 
     @Override
@@ -18,19 +19,18 @@ public class SpinWheelCommand extends Command {
 
     @Override
     protected void execute() {
-        Robot.Wheel.spin(OI.xbox.getRawAxis(5));
-
+        Robot.Drivetrain.rotateDegrees(rotation);
     }
 
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return false;
+        return Robot.Drivetrain.gyroOnTarget();
     }
 
     @Override
     protected void end() {
-        Robot.Wheel.spin(0.0);
+        Robot.Drivetrain.rotateDegrees(0.0);
     }
 
     @Override

@@ -16,6 +16,7 @@ public class WheelSubsystem extends Subsystem {
 
     private final double REVS_PER_DEGREE = 8.57142857; //TODO: Confirm Value
     private final double WHEEL_TO_CONTROL_PANEL = 14.146/1.0; //wheel rotations : control panel
+    private final double GEARBOX_RATIO = 90.0; //keep in mind with certain specific controls
 
     public static final double ROTATE_SPEED = 0.85;
 

@@ -7,6 +7,7 @@ public class ClimberSubsystem extends Subsystem {
 
 // Any variables/fields used in the constructor must appear before the "INSTANCE" variable
 // so that they are initialized before the constructor is called.
+private final double GEARBOX_RATIO = 90.0;
 
     /**
      * The Singleton instance of this ClimberSubsystem. External classes should

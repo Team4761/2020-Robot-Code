@@ -1,36 +1,36 @@
-package org.robockets.infiniterecharge.wheel;
+package org.robockets.infiniterecharge.autonomous;
 
 import edu.wpi.first.wpilibj.command.Command;
-import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
-import org.robockets.infiniterecharge.wheel.WheelSubsystem;
 
-public class SpinWheelCommand extends Command {
+public class MoveAutoControlledCommand extends Command {
 
-    public SpinWheelCommand() {
-        requires(Robot.Wheel);
+    private double distance;
+
+    public MoveAutoControlledCommand(double inches) {
+        requires(Robot.Drivetrain);
+        this.distance = inches;
     }
 
     @Override
     protected void initialize() {
-
+        Robot.Drivetrain.translateInches(distance);
+        Robot.Drivetrain.resetGyro();
     }
 
     @Override
     protected void execute() {
-        Robot.Wheel.spin(OI.xbox.getRawAxis(5));
-
     }
 
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return false;
+        return Robot.Drivetrain.onTarget();
     }
 
     @Override
     protected void end() {
-        Robot.Wheel.spin(0.0);
+        Robot.Drivetrain.translateInches(0.0);
     }
 
     @Override

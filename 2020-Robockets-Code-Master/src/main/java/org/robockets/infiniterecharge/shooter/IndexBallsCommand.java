@@ -1,14 +1,14 @@
-package org.robockets.infiniterecharge.wheel;
+package org.robockets.infiniterecharge.shooter;
 
 import edu.wpi.first.wpilibj.command.Command;
-import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
-import org.robockets.infiniterecharge.wheel.WheelSubsystem;
+import org.robockets.infiniterecharge.RobotMap;
 
-public class SpinWheelCommand extends Command {
+public class IndexBallsCommand extends Command {
 
-    public SpinWheelCommand() {
-        requires(Robot.Wheel);
+    public IndexBallsCommand() {
+        requires(Robot.Shooter);
+        // If any subsystems are needed, you will need to pass them into the requires() method
     }
 
     @Override
@@ -18,8 +18,8 @@ public class SpinWheelCommand extends Command {
 
     @Override
     protected void execute() {
-        Robot.Wheel.spin(OI.xbox.getRawAxis(5));
-
+        if(RobotMap.intakeBreakBeam.get() && !RobotMap.flywheelBreakBeam.get())
+            Robot.Shooter.movePolyCord(0.85);
     }
 
     @Override
@@ -30,11 +30,11 @@ public class SpinWheelCommand extends Command {
 
     @Override
     protected void end() {
-        Robot.Wheel.spin(0.0);
+
     }
 
     @Override
     protected void interrupted() {
-        end();
+
     }
 }

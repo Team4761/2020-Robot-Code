@@ -3,7 +3,6 @@ package org.robockets.infiniterecharge.drivetrain;
 import edu.wpi.first.wpilibj.command.Command;
 import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
-import org.robockets.infiniterecharge.drivetrain.DrivetrainSubsystem;
 
 public class TankrideCommand extends Command {
 
@@ -31,7 +30,7 @@ public class TankrideCommand extends Command {
         /*left = ((left-previousLeft)*RAMP_FACTOR)+previousLeft;  //PID on the drivetrain might mess the ramp factor, so it's commented for now
         right = ((right-previousRight)*RAMP_FACTOR)+previousRight;*/
 
-        Robot.Drivetrain.driveTrank(left, right);
+        Robot.Drivetrain.driveTank(left, right);
 
     }
 
@@ -43,7 +42,7 @@ public class TankrideCommand extends Command {
 
     @Override
     protected void end() {
-
+        Robot.Drivetrain.driveTank(0.0,0.0);
     }
 
     @Override

@@ -2,11 +2,30 @@ package org.robockets.infiniterecharge.shooter;
 
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import org.robockets.infiniterecharge.OI;
+import org.robockets.infiniterecharge.Robot;
+import org.robockets.infiniterecharge.RobotMap;
 
 public class ShooterSubsystem extends Subsystem {
 
 // Any variables/fields used in the constructor must appear before the "INSTANCE" variable
 // so that they are initialized before the constructor is called.
+
+    public int ballCount = 0;
+
+    private final double GEARBOX_RATIO = 90.0;
+
+    private final double REVS_PER_INCH = 1.0; //TODO: find an actual value
+    private final double REVS_PER_DEGREE = 0.0;
+
+    private final double ABSOLUTE_TOLERANCE = 0.5; //inches
+
+    private final double Kp = 0.0;
+    private final double Ki = 0.0;
+    private final double Kd = 0.0;
+
+    private double setpoint;
 
     /**
      * The Singleton instance of this ShooterSubsystem. External classes should
@@ -20,6 +39,7 @@ public class ShooterSubsystem extends Subsystem {
      * should use the {@link #getInstance()} method to get the instance.
      */
     private ShooterSubsystem() {
+        //polyPID = new PIDController(Kp,Ki,Kd);
 
     }
 
@@ -36,6 +56,33 @@ public class ShooterSubsystem extends Subsystem {
     protected void initDefaultCommand() {
         // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
         //       e.g. setDefaultCommand(new MyCommand());
+        setDefaultCommand(new MoveBallsCommand(OI.xbox.getRawAxis(5),OI.xbox.getRawAxis(2),OI.xbox.getRawAxis(3)));
+    }
+
+    public void movePolyCord(double speed) {
+        RobotMap.PolyCordController.set(speed);
+    }
+
+    public void fireFlyWheel(double speed) {
+        RobotMap.FlyWheel1.set(speed);
+        RobotMap.FlyWheel2.set(speed);
+    }
+
+    /*public void movePolyCordExact(double inches) {
+        this.setpoint = inches*REVS_PER_INCH;
+        RobotMap.PolyCordController.set(polyPID.calculate(RobotMap.PolyCordController.get(),inches*REVS_PER_DEGREE ));
+    }*/
+
+    public boolean isBreakBeamBroke() {
+        return false;
+    }
+
+    /*public boolean onTarget() { //onTarget with tolerance
+        return (((RobotMap.PolyCordController.get()-ABSOLUTE_TOLERANCE)<=this.setpoint)&&((RobotMap.PolyCordController.get()+ABSOLUTE_TOLERANCE)>=this.setpoint));
+    }*/
+
+    public void intake(double speed) {
+        RobotMap.InputWheel.set(speed);
     }
 }
 

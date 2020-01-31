@@ -11,8 +11,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.robockets.infiniterecharge.climber.ClimberSubsystem;
 import org.robockets.infiniterecharge.drivetrain.DrivetrainSubsystem;
 import org.robockets.infiniterecharge.drivetrain.JoyrideCommand;
+import org.robockets.infiniterecharge.shooter.ShooterSubsystem;
 import org.robockets.infiniterecharge.wheel.WheelSubsystem;
 
 /**
@@ -30,6 +32,8 @@ public class Robot extends TimedRobot {
 
   public static DrivetrainSubsystem Drivetrain;
   public static WheelSubsystem Wheel;
+  public static ClimberSubsystem Climber;
+  public static ShooterSubsystem Shooter;
   public static OI m_oi;
 
   /**
@@ -44,11 +48,16 @@ public class Robot extends TimedRobot {
 
     Drivetrain = DrivetrainSubsystem.getInstance();
     Wheel = WheelSubsystem.getInstance();
+    Shooter = ShooterSubsystem.getInstance();
+    Climber = ClimberSubsystem.getInstance();
 
     m_oi = OI.getInstance();
 
-    //JoyrideCommand Joyride = new JoyrideCommand();
+    JoyrideCommand Joyride = new JoyrideCommand();
     //TankrideCommand Tankride = new TankrideCommand(Drivetrain);
+
+
+    SmartDashboard.putNumber("Motor movement", RobotMap.FrontLeft.get());
   }
 
   /**
@@ -62,7 +71,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     Scheduler.getInstance().run();
-    Wheel.WheelSubsystemPeriodic();
+    //Wheel.WheelSubsystemPeriodic();
   }
 
   /**

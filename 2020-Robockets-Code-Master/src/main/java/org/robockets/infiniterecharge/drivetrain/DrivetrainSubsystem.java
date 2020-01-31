@@ -1,10 +1,12 @@
 package org.robockets.infiniterecharge.drivetrain;
 
 
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.robockets.infiniterecharge.RobotMap;
 import org.robockets.infiniterecharge.OI;
 
@@ -12,14 +14,13 @@ public class DrivetrainSubsystem extends Subsystem {
 
 // Any variables/fields used in the constructor must appear before the "INSTANCE" variable
 // so that they are initialized before the constructor is called.
-
-    //private final double INCHES_PER_TICK = 1.0; // TODO: Get an actual value
+    private final double GEARBOX_RATIO = 90.0; //TODO: implement gearbox ratio properly
 
     private final double REVS_PER_INCH = 1.0; //TODO: Get an actual value
     private final double ABSOLUTE_TOLERANCE = 0.5; //inches. TODO: Get an actual value
 
     private final double REVS_PER_DEGREE = 8.57142857; //TODO: Verify value
-    private final double ROT_ABSOLUTE_TOLERANCE = 5.0; //degrees.
+    private final double ROT_ABSOLUTE_TOLERANCE = 2.0; //degrees.
 
     private CANPIDController m_frontleftPIDController;
     private CANPIDController m_backleftPIDController;
@@ -29,7 +30,11 @@ public class DrivetrainSubsystem extends Subsystem {
 
     private CANPIDController[] wheels = {m_backrightPIDController, m_backleftPIDController, m_frontrightPIDController, m_frontleftPIDController};
 
-    //private GyroPIDOutput gyroPIDOutput;
+    private double[] setPoints = {0.0,0.0,0.0,0.0};
+
+    private double gyrosetpoint;
+
+
     private PIDController gyroPIDController;
 
     public static final double TRANSLATE_SPEED = 0.85;
@@ -75,6 +80,11 @@ public class DrivetrainSubsystem extends Subsystem {
         RobotMap.FrontRight.burnFlash();
         RobotMap.BackRight.burnFlash();
 
+        gyroPIDController = new PIDController(0.0, 0.0, 0.0);
+        SmartDashboard.putData("GyroPID", gyroPIDController);
+
+        disablePid();
+
     }
 
     /**
@@ -95,11 +105,9 @@ public class DrivetrainSubsystem extends Subsystem {
 
     public void driveArcade(double translate, double rotate) {
         RobotMap.RobotDrive.arcadeDrive(translate,rotate);
-        //This can and will change dependent on what controller we use
     }
 
-    public void driveTrank(double left, double right) {
-         //implies we use The flight controllers
+    public void driveTank(double left, double right) {
         RobotMap.RobotDrive.tankDrive(left,right);
     }
 
@@ -108,6 +116,7 @@ public class DrivetrainSubsystem extends Subsystem {
     }
 
     //The next following will orientate certain PID functions
+
     public void disablePid() { //will this even work? I'm worried about translate speed more than anything.
         m_frontleftPIDController.setReference(RobotMap.FrontLeft.getEncoder().getPosition()/REVS_PER_INCH*TRANSLATE_SPEED, ControlType.kPosition);
         m_backleftPIDController.setReference(RobotMap.BackLeft.getEncoder().getPosition()/REVS_PER_INCH*TRANSLATE_SPEED, ControlType.kPosition);
@@ -146,7 +155,40 @@ public class DrivetrainSubsystem extends Subsystem {
         }
     }
 
-    public void setSetPoint() {
+    //Specifically autonomous translate and rotate
+
+    public void translateInches(double inches) {
+        //driveArcade(inches*INCHES_PER_TICK,0.0);
+        for(int i = 0; i <= 4; i++) {
+            wheels[i].setReference(inches*REVS_PER_INCH, ControlType.kPosition);
+            setPoints[i] = inches * REVS_PER_INCH;
+        }
+    }
+
+    public boolean onTarget() { //I hate this >:( It does work though...
+        double onTarget[] =
+                {RobotMap.FrontLeftEncoder.getPosition()/REVS_PER_INCH,
+                RobotMap.FrontRightEncoder.getPosition()/REVS_PER_INCH,
+                RobotMap.BackRightEncoder.getPosition()/REVS_PER_INCH,
+                RobotMap.BackLeftEncoder.getPosition()/REVS_PER_INCH};
+
+        return     (onTarget[0]>=setPoints[0]-ABSOLUTE_TOLERANCE&&onTarget[0]<=setPoints[0]+ABSOLUTE_TOLERANCE)
+                && (onTarget[1]>=setPoints[1]-ABSOLUTE_TOLERANCE&&onTarget[1]<=setPoints[1]+ABSOLUTE_TOLERANCE)
+                && (onTarget[2]>=setPoints[2]-ABSOLUTE_TOLERANCE&&onTarget[2]<=setPoints[2]+ABSOLUTE_TOLERANCE)
+                && (onTarget[3]>=setPoints[3]-ABSOLUTE_TOLERANCE&&onTarget[3]<=setPoints[3]+ABSOLUTE_TOLERANCE);
+    }
+
+    public void resetGyro() { //do this before Rotate degrees
+        gyroPIDController.reset();
+    }
+
+    public void rotateDegrees(double degrees) { //Dependent on the Gyro, rather than the CANPIDControllers for degree
+        this.gyrosetpoint = degrees;
+        driveArcade(0.0, gyroPIDController.calculate(RobotMap.Gyro.getAngle(),degrees));
+    }
+
+    public boolean gyroOnTarget() { //Targeting with tolerance
+        return (RobotMap.Gyro.getAngle()-ROT_ABSOLUTE_TOLERANCE>=gyrosetpoint)&&(RobotMap.Gyro.getAngle()+ROT_ABSOLUTE_TOLERANCE<=gyrosetpoint);
     }
 
     //The next set of commands are for when motion profiling becomes a thing

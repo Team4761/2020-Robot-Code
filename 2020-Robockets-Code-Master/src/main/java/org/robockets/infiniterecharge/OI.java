@@ -1,8 +1,11 @@
 package org.robockets.infiniterecharge;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import org.robockets.infiniterecharge.climber.reelIn;
+import org.robockets.infiniterecharge.climber.reelOut;
+import org.robockets.infiniterecharge.climber.telescopeIn;
+import org.robockets.infiniterecharge.climber.telescopeOut;
 import org.robockets.infiniterecharge.wheel.MovePistonCommand;
 
 public class OI {
@@ -10,6 +13,12 @@ public class OI {
 
     //arcade drive version
     public static Joystick xbox = new Joystick(0);
+
+    public static JoystickButton a = new JoystickButton(xbox, 0);
+    public static JoystickButton b = new JoystickButton(xbox, 1);
+    public static JoystickButton x = new JoystickButton(xbox, 2);
+    public static JoystickButton y = new JoystickButton(xbox, 3);
+
 
     //tank drive version
     public static Joystick flight1 = new Joystick(1); //Yes it COULD go into port 1, but that will cause a runtime error.
@@ -22,11 +31,19 @@ public class OI {
     public static JoystickButton b101 = new JoystickButton(buttonboard1, 1);
     public static JoystickButton b102 = new JoystickButton(buttonboard1, 2);
 
+
+
     public static final OI INSTANCE = new OI();
 
     private OI() {
         b100.whenPressed(new MovePistonCommand(true)); //TODO: Simplify this down to 1 button
         b101.whenPressed(new MovePistonCommand(false));
+        a.whileActive(new telescopeIn());
+        b.whileActive(new reelIn());
+        x.whileActive(new telescopeOut());
+        y.whileActive(new reelOut());
+
+
     }
 
     public static OI getInstance() {

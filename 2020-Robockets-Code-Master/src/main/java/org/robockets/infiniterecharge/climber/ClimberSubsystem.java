@@ -2,6 +2,7 @@ package org.robockets.infiniterecharge.climber;
 
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import org.robockets.infiniterecharge.RobotMap;
 
 public class ClimberSubsystem extends Subsystem {
 
@@ -37,6 +38,22 @@ private final double GEARBOX_RATIO = 90.0;
     protected void initDefaultCommand() {
         // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
         //       e.g. setDefaultCommand(new MyCommand());
+    }
+
+    public static void reelIn(){
+        RobotMap.ReelInLeft.set(0.5); //will change
+    }
+
+    public static void reelOut(){
+        RobotMap.ReelInLeft.set(-0.5); //will change
+    }
+
+    public void telescopeUp(){
+        RobotMap.Telescope.set(0.5); //will change
+    }
+
+    public void telescopeDown(){
+        RobotMap.Telescope.set(-0.5); //will change
     }
 }
 

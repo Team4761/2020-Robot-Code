@@ -1,11 +1,16 @@
 package org.robockets.infiniterecharge.climber;
 
 import edu.wpi.first.wpilibj.command.Command;
+import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
 import org.robockets.infiniterecharge.RobotMap;
 
+import static org.robockets.infiniterecharge.Robot.Climber;
+
 //to go down
 public class telescopeIn extends Command {
+
+
     public telescopeIn() {
         requires(Robot.Climber);
         // Use requires() here to declare subsystem dependencies
@@ -19,7 +24,7 @@ public class telescopeIn extends Command {
      */
     @Override
     protected void initialize() {
-        RobotMap.Telescope.set(-0.5);    //TODO: Map actual speeds
+
 
     }
 
@@ -30,6 +35,11 @@ public class telescopeIn extends Command {
      */
     @Override
     protected void execute() {
+        if(OI.a.get()){
+            Climber.telescopeUp();
+        }else{
+            Climber.stopTele();
+        }
 
     }
 
@@ -54,7 +64,7 @@ public class telescopeIn extends Command {
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return true;
+        return false;
     }
 
 

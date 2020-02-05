@@ -1,11 +1,15 @@
 package org.robockets.infiniterecharge.climber;
 
 import edu.wpi.first.wpilibj.command.Command;
+import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
 import org.robockets.infiniterecharge.RobotMap;
 
+import static org.robockets.infiniterecharge.Robot.Climber;
+
 //to go down
 public class reelOut extends Command {
+
     public reelOut() {
         requires(Robot.Climber);
         // Use requires() here to declare subsystem dependencies
@@ -19,7 +23,7 @@ public class reelOut extends Command {
      */
     @Override
     protected void initialize() {
-        RobotMap.ReelInLeft.set(0.5);    //TODO: find actual speed
+
 
     }
 
@@ -30,6 +34,11 @@ public class reelOut extends Command {
      */
     @Override
     protected void execute() {
+        if(OI.y.get()){
+            Climber.reelOut();
+        }else{
+            Climber.stopReel();
+        }
 
     }
 
@@ -54,7 +63,7 @@ public class reelOut extends Command {
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return true;
+        return false;
     }
 
 

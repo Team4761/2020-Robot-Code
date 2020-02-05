@@ -54,6 +54,50 @@ private final double GEARBOX_RATIO = 90.0;
 
     public void telescopeDown(){
         RobotMap.Telescope.set(-0.5); //will change
+
     }
+
+    public void stopReel(){
+        RobotMap.ReelInLeft.set(0);
+    }
+
+    public void stopTele(){
+        RobotMap.Telescope.set(0);
+    }
+    //button presses
+    /*
+    public static void bPressed(){
+        reelIn.bPressed = true;
+    }
+
+    public static void bReleased(){
+        reelIn.bPressed = false;
+    }
+
+    public static void aPressed(){
+        telescopeIn.aPressed = true;
+    }
+
+    public static void aReleased(){
+        telescopeIn.aPressed = false;
+    }
+
+    public static void xPressed(){
+        telescopeOut.xPressed = true;
+    }
+
+    public static void xReleased(){
+        telescopeOut.xPressed = false;
+    }
+
+    public static void yPressed(){
+        reelOut.yPressed = true;
+    }
+
+    public static void yReleased(){
+        reelOut.yPressed = false;
+    }
+
+     */
 }
 

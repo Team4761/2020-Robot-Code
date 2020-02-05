@@ -38,10 +38,10 @@ public class OI {
     private OI() {
         b100.whenPressed(new MovePistonCommand(true)); //TODO: Simplify this down to 1 button
         b101.whenPressed(new MovePistonCommand(false));
-        a.whileActive(new telescopeIn());
-        b.whileActive(new reelIn());
-        x.whileActive(new telescopeOut());
-        y.whileActive(new reelOut());
+        a.whenPressed(new telescopeIn());
+        b.whenPressed(new reelIn());
+        x.whenPressed(new telescopeOut());
+        y.whenPressed(new reelOut());
 
 
     }

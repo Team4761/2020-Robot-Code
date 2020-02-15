@@ -1,10 +1,8 @@
 package org.robockets.infiniterecharge.shooter;
 
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import org.robockets.infiniterecharge.OI;
-import org.robockets.infiniterecharge.Robot;
 import org.robockets.infiniterecharge.RobotMap;
 
 public class ShooterSubsystem extends Subsystem {
@@ -54,18 +52,17 @@ public class ShooterSubsystem extends Subsystem {
 
     @Override
     protected void initDefaultCommand() {
-        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
-        //       e.g. setDefaultCommand(new MyCommand());
-        setDefaultCommand(new MoveBallsCommand(OI.xbox.getRawAxis(5),OI.xbox.getRawAxis(2),OI.xbox.getRawAxis(3)));
+        setDefaultCommand(new MoveBallsCommand());
     }
 
     public void movePolyCord(double speed) {
-        RobotMap.PolyCordController.set(speed);
+        RobotMap.PolyCordControllerTop.set(ControlMode.Current,speed);
+        RobotMap.PolyCordControllerBotton.set(ControlMode.Current,speed);
     }
 
     public void fireFlyWheel(double speed) {
-        RobotMap.FlyWheel1.set(speed);
-        RobotMap.FlyWheel2.set(speed);
+        //RobotMap.FlyWheel1.set(speed);
+        //RobotMap.FlyWheel2.set(speed);
     }
 
     /*public void movePolyCordExact(double inches) {
@@ -82,7 +79,7 @@ public class ShooterSubsystem extends Subsystem {
     }*/
 
     public void intake(double speed) {
-        RobotMap.InputWheel.set(speed);
+        RobotMap.InputWheel.set(ControlMode.Current,speed);
     }
 }
 

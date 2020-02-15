@@ -14,31 +14,26 @@ public class DrivetrainSubsystem extends Subsystem {
 
 // Any variables/fields used in the constructor must appear before the "INSTANCE" variable
 // so that they are initialized before the constructor is called.
-    private final double GEARBOX_RATIO = 90.0; //TODO: implement gearbox ratio properly
-
     private final double REVS_PER_INCH = 1.0; //TODO: Get an actual value
     private final double ABSOLUTE_TOLERANCE = 0.5; //inches. TODO: Get an actual value
 
     private final double REVS_PER_DEGREE = 8.57142857; //TODO: Verify value
     private final double ROT_ABSOLUTE_TOLERANCE = 2.0; //degrees.
 
-    private CANPIDController m_frontleftPIDController;
-    private CANPIDController m_backleftPIDController;
+    private CANPIDController m_frontleftPIDController = RobotMap.FrontLeft.getPIDController();
+    private CANPIDController m_backleftPIDController = RobotMap.BackLeft.getPIDController();
 
-    private CANPIDController m_frontrightPIDController;
-    private CANPIDController m_backrightPIDController;
+    private CANPIDController m_frontrightPIDController = RobotMap.FrontRight.getPIDController();
+    private CANPIDController m_backrightPIDController = RobotMap.BackRight.getPIDController();
 
     private CANPIDController[] wheels = {m_backrightPIDController, m_backleftPIDController, m_frontrightPIDController, m_frontleftPIDController};
-
     private double[] setPoints = {0.0,0.0,0.0,0.0};
 
     private double gyrosetpoint;
+    private PIDController gyroPIDController; //Gyro has its own set of PID vars
 
-
-    private PIDController gyroPIDController;
-
-    public static final double TRANSLATE_SPEED = 0.85;
-    public static final double ROTATE_SPEED = 0.85;
+    public static final double TRANSLATE_SPEED = 1.0;
+    public static final double ROTATE_SPEED = 1.0;
 
     private final double Kp = 0.0;
     private final double Ki = 0.0;
@@ -60,13 +55,8 @@ public class DrivetrainSubsystem extends Subsystem {
      * should use the {@link #getInstance()} method to get the instance.
      */
     private DrivetrainSubsystem() { //TODO: regarding PID updating. Does anything need to be into periodic?
-        m_frontleftPIDController = RobotMap.FrontLeft.getPIDController();
-        m_backleftPIDController = RobotMap.BackLeft.getPIDController();
 
-        m_frontrightPIDController = RobotMap.FrontRight.getPIDController();
-        m_backrightPIDController = RobotMap.BackRight.getPIDController();
-
-        for(int i = 0; i<=4; i++) { //Condensed code. Easier to write
+        for(int i = 0; i<=3; i++) {
             wheels[i].setP(Kp);
             wheels[i].setI(Ki);
             wheels[i].setD(Kd);
@@ -81,10 +71,8 @@ public class DrivetrainSubsystem extends Subsystem {
         RobotMap.BackRight.burnFlash();
 
         gyroPIDController = new PIDController(0.0, 0.0, 0.0);
-        SmartDashboard.putData("GyroPID", gyroPIDController);
 
         disablePid();
-
     }
 
     /**
@@ -98,8 +86,6 @@ public class DrivetrainSubsystem extends Subsystem {
 
     @Override
     protected void initDefaultCommand() {
-        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
-        //       e.g. setDefaultCommand(new MyCommand());
         setDefaultCommand(new JoyrideCommand());
     }
 
@@ -111,7 +97,7 @@ public class DrivetrainSubsystem extends Subsystem {
         RobotMap.RobotDrive.tankDrive(left,right);
     }
 
-    public void stop() {
+    public void driveStop() {
         RobotMap.RobotDrive.arcadeDrive(0.0, 0.0);
     }
 
@@ -132,7 +118,6 @@ public class DrivetrainSubsystem extends Subsystem {
     }
 
     public void disablePID() {
-
         for(int i = 0; i<=4; i++) { //Condensed code. Easier to write
             wheels[i].setP(0.0);
             wheels[i].setI(0.0);
@@ -144,7 +129,6 @@ public class DrivetrainSubsystem extends Subsystem {
     }
 
     public void enablePID() {
-
         for(int i = 0; i<=4; i++) { //Condensed code. Easier to write
             wheels[i].setP(Kp);
             wheels[i].setI(Ki);
@@ -165,7 +149,7 @@ public class DrivetrainSubsystem extends Subsystem {
         }
     }
 
-    public boolean onTarget() { //I hate this >:( It does work though...
+    public boolean onTarget() { //I hate this >:( It does work though...?
         double onTarget[] =
                 {RobotMap.FrontLeftEncoder.getPosition()/REVS_PER_INCH,
                 RobotMap.FrontRightEncoder.getPosition()/REVS_PER_INCH,

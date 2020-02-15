@@ -23,7 +23,7 @@ public class JoyrideCommand extends Command {
 
     @Override
     protected void execute() {
-        double translate = OI.xbox.getRawAxis(1)*DrivetrainSubsystem.TRANSLATE_SPEED;
+        double translate = -OI.xbox.getRawAxis(1)*DrivetrainSubsystem.TRANSLATE_SPEED;
         double rotate = -OI.xbox.getRawAxis(0)*DrivetrainSubsystem.ROTATE_SPEED;
 
         /*translate = ((translate-previousTranslate)*RAMP_FACTOR)+previousTranslate; //PID systems may mess this over, so here. I just kept it simple
@@ -43,7 +43,7 @@ public class JoyrideCommand extends Command {
 
     @Override
     protected void end() {
-        Robot.Drivetrain.driveArcade(0.0, 0.0);
+        Robot.Drivetrain.driveStop();
     }
 
     @Override

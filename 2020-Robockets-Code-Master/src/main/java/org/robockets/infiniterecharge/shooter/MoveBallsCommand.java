@@ -8,12 +8,17 @@ public class MoveBallsCommand extends Command {
 
     double polycord;
     double flywheel;
+    //boolean flywheelon;
     double intake;
 
     public MoveBallsCommand(double polycord, double flywheel, double intake) { //this is designed differently so I can use auto code with
         this.polycord = polycord;
         this.flywheel = flywheel;
         this.intake = intake;
+        requires(Robot.Shooter);
+    }
+
+    public MoveBallsCommand() {
         requires(Robot.Shooter);
     }
 
@@ -24,9 +29,12 @@ public class MoveBallsCommand extends Command {
 
     @Override
     protected void execute() {
-        Robot.Shooter.movePolyCord(polycord); //up and down
+        if(OI.xbox.getRawButton(0)) this.flywheel = 1.0;
+        else this.flywheel = 0.0;
+
+        Robot.Shooter.movePolyCord(OI.xbox.getRawAxis(3)); //up and down
         Robot.Shooter.fireFlyWheel(flywheel); //one of the triggers
-        Robot.Shooter.intake(intake); //If it only needs to be a one way input, then we're fine
+        Robot.Shooter.intake(OI.xbox.getRawAxis(2)); //If it only needs to be a one way input, then we're fine
     }
 
     @Override

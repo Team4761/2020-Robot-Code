@@ -1,13 +1,19 @@
 package org.robockets.infiniterecharge.wheel;
 
 import edu.wpi.first.wpilibj.command.Command;
-import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
 import org.robockets.infiniterecharge.wheel.WheelSubsystem;
 
-public class SpinWheelCommand extends Command {
+public class RevCounterCommand extends Command {
 
-    public SpinWheelCommand() {
+    private boolean direction;
+    private double rev;
+    private double revmax;
+
+    public RevCounterCommand(boolean direction, double revmax) {
+        this.direction = direction;
+        this.rev = 0.0;
+        this.revmax = revmax;
         requires(Robot.Wheel);
     }
 
@@ -18,14 +24,13 @@ public class SpinWheelCommand extends Command {
 
     @Override
     protected void execute() {
-        Robot.Wheel.spin(OI.xbox.getRawAxis(4));
-
+        rev = WheelSubsystem.colorsensorEncoder.calculateRevs(direction);
     }
 
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return false;
+        return (revmax == rev);
     }
 
     @Override
@@ -35,6 +40,6 @@ public class SpinWheelCommand extends Command {
 
     @Override
     protected void interrupted() {
-        end();
+        this.end();
     }
 }

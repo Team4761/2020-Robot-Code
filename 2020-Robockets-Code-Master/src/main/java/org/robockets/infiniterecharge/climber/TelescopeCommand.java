@@ -1,13 +1,16 @@
-package org.robockets.infiniterecharge.shooter;
+package org.robockets.infiniterecharge.climber;
 
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.command.Command;
 import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.Robot;
-import org.robockets.infiniterecharge.RobotMap;
 
-public class IndexBallsCommand extends Command {
+public class TelescopeCommand extends Command {
 
-    public IndexBallsCommand() {
+    private double speed;
+
+    public TelescopeCommand(double speed) {
+        this.speed = speed;
         requires(Robot.Shooter);
         // If any subsystems are needed, you will need to pass them into the requires() method
     }
@@ -19,11 +22,9 @@ public class IndexBallsCommand extends Command {
 
     @Override
     protected void execute() {
-        if(OI.button101.get()) Robot.Shooter.intake(1.0); else Robot.Shooter.intake(0.0);
-
-        if(RobotMap.intakeBreakBeam.get() && !RobotMap.flywheelBreakBeam.get()) Robot.Shooter.movePolyCord(0.85);
-
-        System.out.println("intake break beam: " + RobotMap.intakeBreakBeam.get() + " flywheel break beam: " + RobotMap.flywheelBreakBeam.get());
+        if(OI.b103.get()) Robot.Climber.telescope(speed);
+        else if(OI.b104.get()) Robot.Climber.telescope(-speed);
+        else Robot.Climber.reel(0.0);
     }
 
     @Override
@@ -34,11 +35,11 @@ public class IndexBallsCommand extends Command {
 
     @Override
     protected void end() {
-
+        Robot.Climber.telescope(0.0);
     }
 
     @Override
     protected void interrupted() {
-
+        end();
     }
 }

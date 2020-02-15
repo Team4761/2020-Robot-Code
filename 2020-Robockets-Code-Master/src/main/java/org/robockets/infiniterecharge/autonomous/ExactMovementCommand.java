@@ -1,41 +1,40 @@
-package org.robockets.infiniterecharge.drivetrain;
+package org.robockets.infiniterecharge.autonomous;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.robockets.infiniterecharge.Robot;
 
-public class DriveStraightCommand extends Command {
+public class ExactMovementCommand extends Command {
 
     private double distance;
 
-    public DriveStraightCommand(double speed, double seconds) {
-        this.distance = speed;
-        setTimeout(seconds);
+    public ExactMovementCommand(double inches) {
         requires(Robot.Drivetrain);
+        this.distance = inches;
     }
 
     @Override
     protected void initialize() {
-
+        Robot.Drivetrain.translateInches(distance);
+        //Robot.Drivetrain.resetGyro();
     }
 
     @Override
     protected void execute() {
-        Robot.Drivetrain.driveTank(distance, distance);
     }
 
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return isTimedOut();
+        return Robot.Drivetrain.onTarget();
     }
 
     @Override
     protected void end() {
-
+        Robot.Drivetrain.translateInches(0.0);
     }
 
     @Override
     protected void interrupted() {
-
+        end();
     }
 }

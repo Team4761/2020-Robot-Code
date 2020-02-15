@@ -1,32 +1,28 @@
-package org.robockets.infiniterecharge.drivetrain;
+package org.robockets.infiniterecharge.wheel;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.robockets.infiniterecharge.Robot;
 
-public class DriveStraightCommand extends Command {
+public class MoveArmCommand extends Command {
 
-    private double distance;
-
-    public DriveStraightCommand(double speed, double seconds) {
-        this.distance = speed;
-        setTimeout(seconds);
-        requires(Robot.Drivetrain);
+    public MoveArmCommand() {
+        requires(Robot.Wheel);
     }
 
     @Override
     protected void initialize() {
-
+        Robot.Wheel.moveArm();
     }
 
     @Override
     protected void execute() {
-        Robot.Drivetrain.driveTank(distance, distance);
+
     }
 
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return isTimedOut();
+        return true;
     }
 
     @Override

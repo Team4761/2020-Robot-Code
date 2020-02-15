@@ -1,9 +1,12 @@
 package org.robockets.infiniterecharge.wheel;
 
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import org.robockets.infiniterecharge.PidSourceType;
+import edu.wpi.first.wpilibj.util.Color;
+import org.robockets.infiniterecharge.OI;
 import org.robockets.infiniterecharge.RobotMap;
 
 public class WheelSubsystem extends Subsystem {
@@ -20,16 +23,13 @@ public class WheelSubsystem extends Subsystem {
 
     public static final double ROTATE_SPEED = 0.85;
 
-    private PIDController WheelSpinnerPID;
-    PidSourceType type = PidSourceType.kdistance;
+    public static final Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
+    public static final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
+    public static final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
+    public static final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
-    private final double Kp = 0.0;
-    private final double Ki = 0.0;
-    private final double Kd = 0.0;
-    private final double max = 1.0;
-    private final double min = -1.0;
-    private final double KIz = 0;
-    private final double KFF = 0;
+    public static final ColorSensorEncoder colorsensorEncoder = new ColorSensorEncoder(19);
+
 
     /**
      * The Singleton instance of this wheelSubsystem. External classes should
@@ -43,11 +43,6 @@ public class WheelSubsystem extends Subsystem {
      * should use the {@link #getInstance()} method to get the instance.
      */
     private WheelSubsystem() {
-        WheelSpinnerPID = new PIDController(Kp,Ki,Kd); //TODO: figure out if I need to normalize the number output
-    }
-
-    public void WheelSubsystemPeriodic() {
-        RobotMap.WheelSpinner.set(WheelSpinnerPID.calculate(RobotMap.WheelSpinnerEncoder.getDistance())); //TODO: Implement gearbox ratios and such (is it even needed)?
     }
 
     /**
@@ -61,32 +56,35 @@ public class WheelSubsystem extends Subsystem {
 
     @Override
     protected void initDefaultCommand() {
-        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
-        //       e.g. setDefaultCommand(new MyCommand());
         setDefaultCommand(new SpinWheelCommand());
     }
 
-    public void MovePiston(boolean position) {
-        RobotMap.PistonArm.set(position);
+    public void moveArm() {
+        //RobotMap.WheelArm.set(ControlMode.Position,OI.xbox.getRawAxis(4));
+        //RobotMap.WheelArm.set(OI.xbox.getRawAxis(4));
+        RobotMap.WheelArm.set(ControlMode.Current,OI.xbox.getRawAxis(4));
+
     }
 
-    public void spinAuto(double degrees) { //TODO: do IRL tests to see if I did the PID correct
-        //RobotMap.WheelSpinner.set(direction? degrees*REVS_PER_DEGREE : -degrees*REVS_PER_DEGREE);
-        WheelSpinnerPID.reset();
-        WheelSpinnerPID.setSetpoint(degrees*REVS_PER_DEGREE);
-    }
 
     public void spin(double speed) {
-        RobotMap.WheelSpinner.set(speed*ROTATE_SPEED);
+        RobotMap.WheelSpinner.set(speed);
     }
 
-    public boolean isOnTarget() {
-        return WheelSpinnerPID.atSetpoint();
+    public int getColor() {
+        ColorMatchResult match = new ColorMatch().matchClosestColor(RobotMap.ColorSensor.getColor());
+
+        if (match.color == kBlueTarget) return 2;
+        else if (match.color == kRedTarget) return 0;
+        else if (match.color == kGreenTarget) return 3;
+        else if (match.color == kYellowTarget) return 1;
+        else return 4;
+
     }
 
-
-
-
+    public int getAccurateColor() {
+        return colorsensorEncoder.calculateAverageColor();
+    }
 
 }
 

@@ -7,13 +7,21 @@ import org.robockets.infiniterecharge.drivetrain.DrivetrainSubsystem;
 
 public class JoyrideCommand extends Command {
 
+    private double slowmode;
+    private double speed;
+
     private final double RAMP_FACTOR = 0.5;
 
     private double previousTranslate = 0.0;
     private double previousRotate = 0.0;
 
-    public JoyrideCommand() {
+    double rot;
+
+    public JoyrideCommand(double translatespeed, double rotatespeed, double slowspeed) {
         requires(Robot.Drivetrain);
+        this.speed = translatespeed;
+        this.rot = rotatespeed;
+        this.slowmode = slowspeed;
     }
 
     @Override
@@ -23,8 +31,11 @@ public class JoyrideCommand extends Command {
 
     @Override
     protected void execute() {
-        double translate = OI.xbox.getRawAxis(1)*DrivetrainSubsystem.TRANSLATE_SPEED;
-        double rotate = -OI.xbox.getRawAxis(0)*DrivetrainSubsystem.ROTATE_SPEED;
+        if(OI.leftBumper.get()) Robot.Drivetrain.TRANSLATE_SPEED = slowmode;
+        else Robot.Drivetrain.TRANSLATE_SPEED = speed;
+
+        double translate = -OI.xbox.getRawAxis(1)*Robot.Drivetrain.TRANSLATE_SPEED;
+        double rotate = -OI.xbox.getRawAxis(4)*rot;
 
         /*translate = ((translate-previousTranslate)*RAMP_FACTOR)+previousTranslate; //PID systems may mess this over, so here. I just kept it simple
         rotate = ((rotate-previousRotate)*RAMP_FACTOR)+previousRotate;
@@ -43,7 +54,7 @@ public class JoyrideCommand extends Command {
 
     @Override
     protected void end() {
-        Robot.Drivetrain.driveArcade(0.0, 0.0);
+        Robot.Drivetrain.driveStop();
     }
 
     @Override

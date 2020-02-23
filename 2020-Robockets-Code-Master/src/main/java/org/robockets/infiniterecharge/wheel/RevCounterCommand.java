@@ -1,16 +1,19 @@
 package org.robockets.infiniterecharge.wheel;
 
-import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.util.Color;
 import org.robockets.infiniterecharge.Robot;
-import org.robockets.infiniterecharge.RobotMap;
+import org.robockets.infiniterecharge.wheel.WheelSubsystem;
 
-@Deprecated(since = "2/19/2020", forRemoval = true)
-public class DetectColorCommand extends Command {
+public class RevCounterCommand extends Command {
 
-    public DetectColorCommand() {
+    private double rev;
+    private double revmax;
+    private double speed;
+
+    public RevCounterCommand(double speed, double revmax) {
+        this.rev = 0.0;
+        this.revmax = revmax;
+        this.speed = speed;
         requires(Robot.Wheel);
     }
 
@@ -21,24 +24,23 @@ public class DetectColorCommand extends Command {
 
     @Override
     protected void execute() {
-        Robot.Wheel.color = Robot.Wheel.getColorString(Robot.Wheel.getColor());
-        //System.out.println(colorString);
-
+        rev = Robot.Wheel.colorsensorEncoder.calculateRevs();
+        Robot.Wheel.spin(speed);
     }
 
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return false;
+        return (revmax == rev);
     }
 
     @Override
     protected void end() {
-
+        Robot.Wheel.spin(0.0);
     }
 
     @Override
     protected void interrupted() {
-        end();
+        this.end();
     }
 }

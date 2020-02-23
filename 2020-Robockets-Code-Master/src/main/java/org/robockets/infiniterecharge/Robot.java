@@ -7,14 +7,30 @@
 
 package org.robockets.infiniterecharge;
 
+import com.ctre.phoenix.motorcontrol.can.VictorSPXConfiguration;
+import com.revrobotics.CANSparkMaxLowLevel;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.robockets.infiniterecharge.LED.LEDPatterns;
+import org.robockets.infiniterecharge.LED.LedStates;
+import org.robockets.infiniterecharge.autonomous.ExactMovementCommand;
+import org.robockets.infiniterecharge.autonomous.RotateCommand;
+import org.robockets.infiniterecharge.autonomous.commandgroups.Auto0CommandGroup;
+import org.robockets.infiniterecharge.autonomous.commandgroups.CenterShotCommandGroup;
+import org.robockets.infiniterecharge.autonomous.commandgroups.TheJerkCommandGroup;
 import org.robockets.infiniterecharge.climber.ClimberSubsystem;
+import org.robockets.infiniterecharge.climber.LiftCommand;
 import org.robockets.infiniterecharge.drivetrain.DrivetrainSubsystem;
 import org.robockets.infiniterecharge.drivetrain.JoyrideCommand;
+import org.robockets.infiniterecharge.shooter.IndexBallsCommand;
+import org.robockets.infiniterecharge.shooter.MoveBallsCommand;
 import org.robockets.infiniterecharge.shooter.ShooterSubsystem;
+import org.robockets.infiniterecharge.wheel.SpinWheelCommand;
 import org.robockets.infiniterecharge.wheel.WheelSubsystem;
 
 /**
@@ -30,11 +46,30 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private final SendableChooser<LedStates> LedState = new SendableChooser<>();
+  private LedStates selectedLED;
+
+  private CameraServer camera;
+
   public static DrivetrainSubsystem Drivetrain;
   public static WheelSubsystem Wheel;
   public static ClimberSubsystem Climber;
   public static ShooterSubsystem Shooter;
   public static OI m_oi;
+
+  //endless commands
+  private static JoyrideCommand joyride;
+  private static IndexBallsCommand indexballs;
+  private static MoveBallsCommand moveballs;
+  private static SpinWheelCommand spinwheel;
+  private static LiftCommand lift;
+
+  //autocommands
+  private static TheJerkCommandGroup thejerk;
+  private static CenterShotCommandGroup centershot;
+  private static Auto0CommandGroup auto0;
+  private static ExactMovementCommand move;
+  private static RotateCommand rotate;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -46,18 +81,77 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    camera = CameraServer.getInstance();
+    camera.startAutomaticCapture();
+
+    configMotors();
+    ledSetup();
+
+    //subsystems
     Drivetrain = DrivetrainSubsystem.getInstance();
     Wheel = WheelSubsystem.getInstance();
     Shooter = ShooterSubsystem.getInstance();
     Climber = ClimberSubsystem.getInstance();
-
     m_oi = OI.getInstance();
 
-    JoyrideCommand Joyride = new JoyrideCommand();
-    //TankrideCommand Tankride = new TankrideCommand(Drivetrain);
+  }
 
+  private void configMotors() {
+    RobotMap.PolyCordControllerBottom.getAllConfigs(new VictorSPXConfiguration());
+    RobotMap.PolyCordControllerTop.getAllConfigs(new VictorSPXConfiguration());
 
-    SmartDashboard.putNumber("Motor movement", RobotMap.FrontLeft.get());
+    RobotMap.Intake.getAllConfigs(new VictorSPXConfiguration());
+  }
+
+  private void putData() {
+    double RobotSpeed = (RobotMap.BackLeftEncoder.getVelocity() + RobotMap.BackRightEncoder.getVelocity() + RobotMap.FrontLeftEncoder.getVelocity() + RobotMap.FrontRightEncoder.getVelocity()) / 4.0;
+    SmartDashboard.putNumber("Robot Speed", RobotSpeed);
+    SmartDashboard.putNumber("Gyro Rotation", RobotMap.Gyro.getAngle()); //this might be reset (b/c of rot auto code)
+    SmartDashboard.putString("Current Color",Wheel.color);
+    SmartDashboard.putNumber("Balls in Chamber",Shooter.getBallCount());
+    SmartDashboard.putNumber("Lift Position",RobotMap.FrontLeftEncoder.getPosition());
+    SmartDashboard.putString("Go To Color",DriverStation.getInstance().getGameSpecificMessage());
+  }
+
+  private void ledSetup() {
+    LedState.addOption("Rainbow", LedStates.Rainbow);
+    LedState.addOption("Red",LedStates.Red);
+    LedState.addOption("Blue",LedStates.Blue);
+    LedState.addOption("Green",LedStates.Green);
+    LedState.addOption("Yellow",LedStates.Yellow);
+    LedState.addOption("Purple",LedStates.Purple);
+    LedState.addOption("Orange",LedStates.Orange);
+    LedState.addOption("White",LedStates.White);
+    LedState.addOption("Blink Blue",LedStates.BlinkBlue);
+    LedState.addOption("Blink Red",LedStates.BlinkRed);
+    LedState.addOption("Blink Purple",LedStates.BlinkPurple);
+    LedState.addOption("Breathe Blue",LedStates.BreatheBlue);
+    LedState.addOption("Breathe Red",LedStates.BreatheRed);
+    LedState.addOption("Move Left",LedStates.MoveLeft);
+    LedState.addOption("Move Right",LedStates.MoveRight);
+
+    LedState.setDefaultOption("Disabled",LedStates.Disabled);
+    LedState.addOption("Robot Decides",LedStates.AutoDecided); //when certain commands trigger usage instead
+
+    SmartDashboard.putData("Led Choices",LedState);
+  }
+
+  private void ledLoop() {
+      selectedLED = LedState.getSelected();
+
+      switch(selectedLED) {
+        case Rainbow: LEDPatterns.rainbow(); break;
+        case Red: LEDPatterns.red(1,1); break;
+        case Green: LEDPatterns.green(1,1); break;
+        case Blue: LEDPatterns.blue(1,1); break;
+        case Yellow: LEDPatterns.pattern(255,255,0,1,1); break;
+        case Orange: LEDPatterns.pattern(255,128,0,1,1); break;
+        case Purple: LEDPatterns.pattern(255,0,255,1,1); break;
+        case White: LEDPatterns.pattern(255,255,255,1,1); break;
+        case MoveLeft: LEDPatterns.colorflow(0,255,255,8); break;
+        case Disabled: LEDPatterns.pattern(0,0,0,0,1); break;
+        default: break; //default should do nothing, and leave it to the robot in debug areas to decide
+      }
   }
 
   /**
@@ -71,7 +165,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     Scheduler.getInstance().run();
-    //Wheel.WheelSubsystemPeriodic();
+    putData();
+
+    //Misc functions that need to be ran (non-mechanical)
+    Wheel.setColor();
+    //ledLoop();
+
   }
 
   /**
@@ -90,6 +189,9 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    thejerk.start();
+
   }
 
   /**
@@ -121,4 +223,16 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
   }
+
+  /*@Override
+  public void disabledInit() {
+    joyride.close();
+    //indexballs.start();
+    moveballs.close();
+    movearm.close();
+    spinwheel.close();
+    detectcolor.close();
+    Telescope.close();
+    Reel.close();
+  }*/
 }

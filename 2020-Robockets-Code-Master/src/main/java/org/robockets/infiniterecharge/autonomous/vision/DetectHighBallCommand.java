@@ -1,16 +1,15 @@
-package org.robockets.infiniterecharge.drivetrain;
+package org.robockets.infiniterecharge.autonomous.vision;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.robockets.infiniterecharge.Robot;
 
-public class DriveStraightCommand extends Command {
+public class DetectHighBallCommand extends Command {
 
-    private double distance;
+    //The Robot Must be at least 30 feet away, and must be aimed towards the high ball
 
-    public DriveStraightCommand(double speed, double seconds) {
-        this.distance = speed;
-        setTimeout(seconds);
+    public DetectHighBallCommand() {
         requires(Robot.Drivetrain);
+        requires(Robot.Shooter);
     }
 
     @Override
@@ -20,13 +19,13 @@ public class DriveStraightCommand extends Command {
 
     @Override
     protected void execute() {
-        Robot.Drivetrain.driveTank(distance, distance);
+
     }
 
     @Override
     protected boolean isFinished() {
         // TODO: Make this return true when this Command no longer needs to run execute()
-        return isTimedOut();
+        return false;
     }
 
     @Override

@@ -24,13 +24,13 @@ public class TankrideCommand extends Command {
 
     @Override
     protected void execute() {
-        double left = -OI.flight1.getRawAxis(1)*DrivetrainSubsystem.ROTATE_SPEED;
-        double right = -OI.flight2.getRawAxis(1)*DrivetrainSubsystem.ROTATE_SPEED;
+        //double left = -OI.flight1.getRawAxis(1)*DrivetrainSubsystem.ROTATE_SPEED;
+        //double right = -OI.flight2.getRawAxis(1)*DrivetrainSubsystem.ROTATE_SPEED;
 
         /*left = ((left-previousLeft)*RAMP_FACTOR)+previousLeft;  //PID on the drivetrain might mess the ramp factor, so it's commented for now
         right = ((right-previousRight)*RAMP_FACTOR)+previousRight;*/
 
-        Robot.Drivetrain.driveTank(left, right);
+        //Robot.Drivetrain.driveTank(left, right);
 
     }
 

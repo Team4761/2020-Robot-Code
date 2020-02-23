@@ -6,9 +6,9 @@ import org.robockets.infiniterecharge.Robot;
 
 public class MoveBallsCommand extends Command {
 
-    double polycord;
-    double flywheel;
-    double intake;
+    private double flywheel;
+    private double polycord;
+    private double intake;
 
     public MoveBallsCommand(double polycord, double flywheel, double intake) { //this is designed differently so I can use auto code with
         this.polycord = polycord;
@@ -24,9 +24,26 @@ public class MoveBallsCommand extends Command {
 
     @Override
     protected void execute() {
+        double flywheel;
+        if (OI.button205.get()) flywheel = this.flywheel;
+        else if (OI.button103.get()) flywheel = -this.flywheel;
+        else if (OI.button111.get()) flywheel = 1.0;
+        else flywheel = 0.0;
+
+        double intake;
+        if (OI.button203.get()) intake = -this.intake;
+        else if (OI.button202.get()) intake = this.intake;
+        else intake = 0.0;
+
+        double polycord;
+        if (OI.button105.get()) polycord = -this.polycord;
+        else if (OI.button102.get()) polycord = this.polycord;
+        else polycord = 0.0;
+
         Robot.Shooter.movePolyCord(polycord); //up and down
         Robot.Shooter.fireFlyWheel(flywheel); //one of the triggers
         Robot.Shooter.intake(intake); //If it only needs to be a one way input, then we're fine
+
     }
 
     @Override
@@ -44,6 +61,6 @@ public class MoveBallsCommand extends Command {
 
     @Override
     protected void interrupted() {
-
+        this.end();
     }
 }

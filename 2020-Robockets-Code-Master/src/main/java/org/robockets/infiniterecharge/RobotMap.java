@@ -1,5 +1,7 @@
 package org.robockets.infiniterecharge;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -10,9 +12,9 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 public class RobotMap {
 
     //drivetrain
-    public static CANSparkMax FrontLeft = new CANSparkMax(0, CANSparkMaxLowLevel.MotorType.kBrushless);
-    public static CANSparkMax BackLeft = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
-    public static CANSparkMax FrontRight = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public static CANSparkMax FrontLeft = new CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public static CANSparkMax BackLeft = new CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public static CANSparkMax FrontRight = new CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless);
     public static CANSparkMax BackRight = new CANSparkMax(3, CANSparkMaxLowLevel.MotorType.kBrushless);
 
     public static CANEncoder FrontLeftEncoder = FrontLeft.getEncoder();
@@ -23,31 +25,43 @@ public class RobotMap {
     public static SpeedControllerGroup Left = new SpeedControllerGroup(FrontLeft, BackLeft);
     public static SpeedControllerGroup Right = new SpeedControllerGroup(FrontRight, BackRight);
 
-    public static DifferentialDrive RobotDrive = new DifferentialDrive(Left,Right);
+    //Just testing to see if the motors are configured correctly
+    public static DifferentialDrive RobotDrive = new DifferentialDrive(Right,Left);
 
     //gyro
     public static ADXRS450_Gyro Gyro = new ADXRS450_Gyro();
 
-    //wheel //TODO: find actual ports!!!
+    //wheel
     public static ColorSensorV3 ColorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+    //public static VictorSP WheelSpinner = new VictorSP(0);
     public static Spark WheelSpinner = new Spark(0);
-    public static Encoder WheelSpinnerEncoder = new Encoder(0,0); //TODO: find correct ports
-    public static Solenoid PistonArm = new Solenoid(1);
+    //public static TalonSRX WheelArm = new TalonSRX(4);
+    public static CANSparkMax WheelArm = new CANSparkMax(7, CANSparkMaxLowLevel.MotorType.kBrushed);
 
     //shooter
-    public static Spark PolyCordController = new Spark(2);
-    public static Spark FlyWheel1 = new Spark(3);
-    public static Spark FlyWheel2 = new Spark(4);
-    public static Spark InputWheel = new Spark(5);
+    public static VictorSPX PolyCordControllerBottom = new VictorSPX(9);
+    public static VictorSPX PolyCordControllerTop = new VictorSPX(10);
+    public static CANSparkMax FlyWheelTop = new CANSparkMax(8, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public static CANSparkMax FlyWheelBottom = new CANSparkMax(9, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public static VictorSPX Intake = new VictorSPX(7);
 
     public static DigitalInput intakeBreakBeam = new DigitalInput(0); //DIO port
+    public static DigitalInput intakeLED = new DigitalInput(1);
     public static DigitalInput flywheelBreakBeam = new DigitalInput(2);
 
     //climber
-    public static Spark Telescope = new Spark(6); //The PWM cable will be spilt between left and right
+    public static VictorSP Telescope = new VictorSP(1); //The PWM cable will be spilt between left and right
 
-    public static Spark ReelInLeft = new Spark(7); //The PWM cable will be split between left and right
-    public static Spark ReelInRight = new Spark(8);
+    public static CANSparkMax ReelInLeft = new CANSparkMax(5, CANSparkMaxLowLevel.MotorType.kBrushless); //One for each.
+    public static CANSparkMax ReelInRight = new CANSparkMax(6, CANSparkMaxLowLevel.MotorType.kBrushless);
 
+    public static CANEncoder ReelInLeftEncoder = new CANEncoder(ReelInLeft);
+    public static CANEncoder ReelInRightEncoder = new CANEncoder(ReelInRight);
 
+    //Vision crap (if we actually do this...)
+    public static DigitalInput laser = new DigitalInput(3);
+
+    //LED
+    public static AddressableLED led = new AddressableLED(9);
+    public static AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(30);
 }

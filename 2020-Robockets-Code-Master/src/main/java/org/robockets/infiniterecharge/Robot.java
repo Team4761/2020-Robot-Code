@@ -114,8 +114,8 @@ public class Robot extends TimedRobot {
     IndexBallsCommand index = new IndexBallsCommand();
 
     //adding commands to scheduler
-    //scheduler.add(index);
-    //index.start();
+    scheduler.add(index);
+    index.start();
   }
 
   private void ledLoop() {

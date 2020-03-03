@@ -1,9 +1,10 @@
 package org.robockets.infiniterecharge.wheel;
 
 
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import org.robockets.infiniterecharge.PidSourceType;
+import edu.wpi.first.wpilibj.util.Color;
 import org.robockets.infiniterecharge.RobotMap;
 
 public class WheelSubsystem extends Subsystem {
@@ -11,25 +12,23 @@ public class WheelSubsystem extends Subsystem {
 // Any variables/fields used in the constructor must appear before the "INSTANCE" variable
 // so that they are initialized before the constructor is called.
 
-    public static String oncolor;
-    public static String tocolor;
+    //Porting all colors over to here ensures a streamline and 1 threaded color collection system.
+    //The only time that the color is received is from Robot.periodic().Wheel.setColor();
+
+    public String color = "Unknown";
+    public int oncolor = 0;
 
     private final double REVS_PER_DEGREE = 8.57142857; //TODO: Confirm Value
     private final double WHEEL_TO_CONTROL_PANEL = 14.146/1.0; //wheel rotations : control panel
     private final double GEARBOX_RATIO = 90.0; //keep in mind with certain specific controls
 
-    public static final double ROTATE_SPEED = 0.85;
+    private final Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
+    private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
+    private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
+    private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
-    private PIDController WheelSpinnerPID;
-    PidSourceType type = PidSourceType.kdistance;
-
-    private final double Kp = 0.0;
-    private final double Ki = 0.0;
-    private final double Kd = 0.0;
-    private final double max = 1.0;
-    private final double min = -1.0;
-    private final double KIz = 0;
-    private final double KFF = 0;
+    private final ColorMatch m_colorMatcher = new ColorMatch();
+    final ColorSensorEncoder colorsensorEncoder = new ColorSensorEncoder(19);
 
     /**
      * The Singleton instance of this wheelSubsystem. External classes should
@@ -43,11 +42,10 @@ public class WheelSubsystem extends Subsystem {
      * should use the {@link #getInstance()} method to get the instance.
      */
     private WheelSubsystem() {
-        WheelSpinnerPID = new PIDController(Kp,Ki,Kd); //TODO: figure out if I need to normalize the number output
-    }
-
-    public void WheelSubsystemPeriodic() {
-        RobotMap.WheelSpinner.set(WheelSpinnerPID.calculate(RobotMap.WheelSpinnerEncoder.getDistance())); //TODO: Implement gearbox ratios and such (is it even needed)?
+        m_colorMatcher.addColorMatch(kBlueTarget);
+        m_colorMatcher.addColorMatch(kGreenTarget);
+        m_colorMatcher.addColorMatch(kRedTarget);
+        m_colorMatcher.addColorMatch(kYellowTarget);
     }
 
     /**
@@ -61,32 +59,55 @@ public class WheelSubsystem extends Subsystem {
 
     @Override
     protected void initDefaultCommand() {
-        // TODO: Set the default command, if any, for this subsystem by calling setDefaultCommand(command)
-        //       e.g. setDefaultCommand(new MyCommand());
-        setDefaultCommand(new SpinWheelCommand());
+        setDefaultCommand(new SpinWheelCommand(0.2,.5,.25));
     }
 
-    public void MovePiston(boolean position) {
-        RobotMap.PistonArm.set(position);
-    }
-
-    public void spinAuto(double degrees) { //TODO: do IRL tests to see if I did the PID correct
-        //RobotMap.WheelSpinner.set(direction? degrees*REVS_PER_DEGREE : -degrees*REVS_PER_DEGREE);
-        WheelSpinnerPID.reset();
-        WheelSpinnerPID.setSetpoint(degrees*REVS_PER_DEGREE);
+    public void moveArm(double value) {
+        //RobotMap.WheelArm.set(ControlMode.Position,OI.xbox.getRawAxis(4));
+        RobotMap.WheelArm.set(value);
+        //RobotMap.WheelArm.set(ControlMode.Current,value);
     }
 
     public void spin(double speed) {
-        RobotMap.WheelSpinner.set(speed*ROTATE_SPEED);
+        RobotMap.WheelSpinner.set(speed);
+        //RobotMap.WheelSpinner.set(RobotMap.wheelPIDController.calculate(RobotMap.WheelSpinner.get() , speed));
     }
 
-    public boolean isOnTarget() {
-        return WheelSpinnerPID.atSetpoint();
+    //getColor() --> ColorSensorEncoder.calculateAverageColor()
+    // --> Wheel.getAverageColor() --> setColor() --> Shuffleboard && Wheel.oncolor
+    //
+    //Something about this feels like it can be simplified...
+
+    public int getColor() {
+        Color detect = RobotMap.ColorSensor.getColor();
+        ColorMatchResult match = m_colorMatcher.matchClosestColor(detect);
+
+        if (match.color == kBlueTarget) return 2;
+        else if (match.color == kRedTarget) return 0;
+        else if (match.color == kGreenTarget) return 3;
+        else if (match.color == kYellowTarget) return 1;
+        else return 4;
     }
 
+    public String getColorString(int col) {
+        switch(col) {
+            case 2: return "Blue";
+            case 0: return "Red";
+            case 3: return "Green";
+            case 1: return "Yellow";
+            default: return "Unknown";
+        }
+    }
 
+    public int getAccurateColor() {
+        return colorsensorEncoder.calculateAverageColor();
+        //return getColor();
+    }
 
-
+    public void setColor() {
+        oncolor = getAccurateColor();
+        color = getColorString(oncolor);
+    }
 
 }
 
